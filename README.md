@@ -18,6 +18,13 @@ the computer to decide whether it should be booted with LOCALBOOT or chain.c32.
 The scripts defaults to LOCALBOOT, but has a list of exceptions for computers 
 that require chainloading.
 
+Syslinux compatibility
+----------------------
+We're still using Syslinux 4.05 in our company because this is the version
+provided by Debian wheezy, and the script probably won't work out of the box
+with newer Syslinux versions. It should be pretty simple to adapt though - I'll
+look into that if I find the time. Patches/pull requests welcome :)
+
 Setup
 -----
 - Copy `localboot.lua` to your `tftpboot` folder.
