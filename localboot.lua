@@ -16,7 +16,7 @@
 -- along with this program; if not, write to the Free Software
 -- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
--- version 2014-09-22
+-- version 2014-09-26
 --
 -- sorting aid:
 --   diff -u <(grep '^    --' localboot.lua) <(grep '^    --' localboot.lua | sort)
@@ -115,6 +115,9 @@ else
   -- ASUS
   elseif (bm == "ASUSTeK Computer INC." and bp == "A8N-VM T-System-CSM") then
     -- ASUS A8N-VM (Mainboard)
+    syslinux.run_command("chain.c32 hd0")
+  elseif (bm == "ASUSTeK COMPUTER INC." and bp == "B85M-E") then
+    -- ASUS B85M-E (Mainboard)
     syslinux.run_command("chain.c32 hd0")
   elseif (bm == "ASUSTeK COMPUTER INC." and bp == "H81M2") then
     -- ASUS H81M2 (Mainboard)
