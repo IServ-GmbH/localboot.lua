@@ -174,6 +174,9 @@ else
   elseif (sm == "FUJITSU SIEMENS" and sp == "ESPRIMO E") then
     -- Fujitsu ESPRIMO E5915 (Desktop PC)
     syslinux.run_command("chain.c32 hd0")
+  elseif (sm == "FUJITSU SIEMENS" and sp == "ESPRIMO Mobile D9510") then
+    -- Fujitsu Esprimo Mobile D9510 (Notebook)
+    syslinux.run_command("chain.c32 hd0")
   elseif (sm == "FUJITSU SIEMENS" and sp == "ESPRIMO Mobile V5535") then
     -- Fujitsu Esprimo Mobile V5535 (Notebook)
     syslinux.run_command("chain.c32 hd0")
