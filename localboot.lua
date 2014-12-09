@@ -155,6 +155,9 @@ else
   elseif (sm == "Dell Inc." and sp == "Latitude E5520") then
     -- Dell Latitude E5520 (Notebook)
     syslinux.run_command("chain.c32 hd0")
+  elseif (sm == "Dell Inc." and sp == "OptiPlex 3020") then
+    -- Dell OptiPlex 3020 (Desktop PC)
+    syslinux.run_command("chain.c32 hd0")
   elseif (sm == "Dell Inc." and sp == "OptiPlex 390") then
     -- Dell OptiPlex 390 (Desktop PC)
     syslinux.run_command("chain.c32 hd0")
@@ -271,6 +274,9 @@ else
     -- Lenovo ThinkCentre M82 (Desktop PC)
     syslinux.run_command("chain.c32 hd0")
   elseif (sm == "LENOVO" and sp == "2697") then
+    -- Lenovo ThinkCentre M82 (Desktop PC)
+    syslinux.run_command("chain.c32 hd0")
+  elseif (sm == "LENOVO" and sp == "2697B63") then
     -- Lenovo ThinkCentre M82 (Desktop PC)
     syslinux.run_command("chain.c32 hd0")
   elseif (sm == "LENOVO" and sv == "ThinkCentre M92") then
