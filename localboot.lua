@@ -19,7 +19,7 @@
 -- version 2015-02-19
 --
 -- sorting aid:
---   diff -u <(grep '^    --' localboot.lua) <(grep '^    --' localboot.lua | sort)
+--   diff -u <(grep '^    -- ' localboot.lua) <(grep '^    -- ' localboot.lua | sort)
 --
 -- syntax check:
 --   sudo aptitude install lua5.1
@@ -131,6 +131,9 @@ else
     syslinux.run_command("chain.c32 hd0")
   elseif (bm == "ASUSTeK COMPUTER INC." and bp == "B85M-E") then
     -- ASUS B85M-E (Mainboard)
+    syslinux.run_command("chain.c32 hd0")
+  elseif (bm == "ASUSTeK COMPUTER INC." and bp == "B85M-G") then
+    -- ASUS B85M-G (Mainboard)
     syslinux.run_command("chain.c32 hd0")
   elseif (bm == "ASUSTeK COMPUTER INC." and bp == "H81M2") then
     -- ASUS H81M2 (Mainboard)
