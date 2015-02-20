@@ -20,10 +20,7 @@ that require chainloading.
 
 Syslinux compatibility
 ----------------------
-We're still using Syslinux 4.05 in our company because this is the version
-provided by Debian wheezy, and the script probably won't work out of the box
-with newer Syslinux versions. It should be pretty simple to adapt though - I'll
-look into that if I find the time. Patches/pull requests welcome :)
+Tested with PXELINUX 4.05 and PXELINUX 6.03.
 
 Setup
 -----

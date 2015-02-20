@@ -16,7 +16,7 @@
 -- along with this program; if not, write to the Free Software
 -- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
--- version 2014-09-26
+-- version 2015-02-19
 --
 -- sorting aid:
 --   diff -u <(grep '^    --' localboot.lua) <(grep '^    --' localboot.lua | sort)
@@ -25,16 +25,29 @@
 --   sudo aptitude install lua5.1
 --   luac5.1 localboot.lua && rm -f luac.out && echo "OK"
 
+local dmi = require "dmi"
+local syslinux = require "syslinux"
+
 if(not dmi.supported())
 then
   syslinux.local_boot(0)
 else
   dmitable = dmi.gettable()
-  sm = dmitable["system.manufacturer"]
-  sv = dmitable["system.version"]
-  sp = dmitable["system.product_name"]
-  bm = dmitable["base_board.manufacturer"]
-  bp = dmitable["base_board.product_name"]
+  if (dmitable.system) then
+    --[[ PXELINUX 6 ]]--
+    sm = dmitable.system.manufacturer
+    sv = dmitable.system.version
+    sp = dmitable.system.product_name
+    bm = dmitable.base_board.manufacturer
+    bp = dmitable.base_board.product_name
+  else
+    --[[ PXELINUX 4 ]]--
+    sm = dmitable["system.manufacturer"]
+    sv = dmitable["system.version"]
+    sp = dmitable["system.product_name"]
+    bm = dmitable["base_board.manufacturer"]
+    bp = dmitable["base_board.product_name"]
+  end
   -- hack so that every line that follows begins with "elseif"
   if (false) then
 
@@ -290,6 +303,19 @@ else
     syslinux.run_command("chain.c32 hd0")
   elseif (sm == "LENOVO" and sv == "ThinkPad T520") then
     -- Lenovo ThinkPad T520 (Notebook)
+    syslinux.run_command("chain.c32 hd0")
+
+  -- Oracle
+  elseif (sm == "innotek GmbH" and sp == "VirtualBox" and
+      string.find(syslinux.version(), "ISOLINUX")) then
+    -- Oracle VirtualBox
+    --[[
+       This is a special case - VirtualBox usually works fine with LOCALBOOT,
+       but it won't work when a CD image is mounted ("Boot failed: press a key
+       to retry...." or "FATAL: INT18: BOOT FAILURE"). This usually implies
+       that we're running from ISOLINUX installed on a CD, so this exception
+       only occurs on ISOLINUX and not on PXELINUX.
+    ]]--
     syslinux.run_command("chain.c32 hd0")
 
   -- Samsung

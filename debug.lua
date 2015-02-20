@@ -1,3 +1,6 @@
+local dmi = require "dmi"
+local syslinux = require "syslinux"
+
 function printdmi(cat, var)
   if (current_cat ~= cat)
   then
@@ -7,7 +10,13 @@ function printdmi(cat, var)
     io.write(string.format("%-20s", "  ." .. var .. ": "))
   end
 
-  val = dmitable[cat .. "." .. var]
+  if (dmitable[cat]) then
+    -- PXELINUX 6
+    val = dmitable[cat][var]
+  else
+    -- PXELINUX 4
+    val = dmitable[cat .. "." .. var]
+  end
   print(string.format('(%2d)"%s"', #val, val))
 end
 
@@ -41,7 +50,10 @@ else
   printdmi("base_board", "serial")
   printdmi("base_board", "asset_tag")
   printdmi("base_board", "location")
+  io.write("PXELINUX version: " .. syslinux.version())
 end
 
 -- lua has io.read(), but lua.c32 doesn't seem to implement it
 syslinux.sleep(600)
+
+-- vim: ft=lua
