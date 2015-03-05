@@ -13,9 +13,9 @@ with the LOCALBOOT command, and need to be booted with chain.c32 instead. We
 also have encountered some computers where it works only the other way -
 chainloading does not work, while LOCALBOOT works fine.
 
-To solve this issue, we have written this Lua script that uses the DMI data of 
-the computer to decide whether it should be booted with LOCALBOOT or chain.c32. 
-The scripts defaults to LOCALBOOT, but has a list of exceptions for computers 
+To solve this issue, we have written this Lua script that uses the DMI data of
+the computer to decide whether it should be booted with LOCALBOOT or chain.c32.
+The scripts defaults to LOCALBOOT, but has a list of exceptions for computers
 that require chainloading.
 
 Syslinux compatibility

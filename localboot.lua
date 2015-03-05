@@ -1,6 +1,6 @@
 -- localboot.lua - a Lua script for syslinux' lua.c32 comboot module that uses
 --                         DMI data to decide between localboot / chainloading
--- Copyright (C) 2014  Martin v. Wittich, IServ GmbH <martin.von.wittich@iserv.eu>
+-- Copyright (C) 2015  Martin v. Wittich, IServ GmbH <martin.von.wittich@iserv.eu>
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
@@ -18,9 +18,6 @@
 
 -- version 2015-02-19
 --
--- sorting aid:
---   diff -u <(grep '^    -- ' localboot.lua) <(grep '^    -- ' localboot.lua | sort)
---
 -- syntax check:
 --   sudo aptitude install lua5.1
 --   luac5.1 localboot.lua && rm -f luac.out && echo "OK"
@@ -28,10 +25,30 @@
 local dmi = require "dmi"
 local syslinux = require "syslinux"
 
-if(not dmi.supported())
-then
+function localboot()
+  print("localboot.lua: localboot")
   syslinux.local_boot(0)
-else
+end
+
+function chain()
+  print("localboot.lua: chainloading")
+  if (syslinux.derivative() == "PXELINUX") then
+    -- PXELINUX; assume the first hard disk is hd0.
+    syslinux.run_command("chain.c32 hd0")
+  else
+    -- ISOLINUX/SYSLIUNX; assume we're running from a USB stick hd0, and hd1 is
+    -- the first hard disk.
+    -- This may not be necessarily correct; ISOLINUX can run both from USB
+    -- sticks and CDs, so we can't know for sure whether the first hard disk is
+    -- hd0 or hd1. There's no chance to fix this though until we have a disk
+    -- API in lua.c32.
+    syslinux.run_command("chain.c32 hd1 swap")
+  end
+end
+
+if(dmi.supported())
+then
+  -- DMI supported
   dmitable = dmi.gettable()
   if (dmitable.system) then
     --[[ PXELINUX 6 ]]--
@@ -48,269 +65,239 @@ else
     bm = dmitable["base_board.manufacturer"]
     bp = dmitable["base_board.product_name"]
   end
+
   -- hack so that every line that follows begins with "elseif"
   if (false) then
 
   -- Acer
-  elseif (sm == "Acer" and sp == "Aspire 3750") then
+  elseif (sm == "Acer") then
+    if (false) then
     -- Acer Aspire 3750 (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Acer" and sp == "Aspire 3810T") then
+    elseif (sp == "Aspire 3750") then chain()
     -- Acer Aspire 3810T (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Acer" and sp == "Aspire 5820TG") then
+    elseif (sp == "Aspire 3810T") then chain()
     -- Acer Aspire 5820TG (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Acer" and sp == "ASE571/AST671") then
+    elseif (sp == "Aspire 5820TG") then chain()
     -- Acer Aspire ASE571/AST671 (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Acer" and sp == "Aspire One 753") then
+    elseif (sp == "ASE571/AST671") then chain()
     -- Acer Aspire One 753 (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Acer" and sp == "AOA150") then
+    elseif (sp == "Aspire One 753") then chain()
     -- Acer Aspire One AOA150 (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Acer            " and sp == "AOD255          ") then
-    -- Acer Aspire One D255 (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Acer" and sp == "Aspire XC600") then
+    elseif (sp == "AOA150") then chain()
     -- Acer Aspire XC600 (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Acer" and sp == "Revo 70") then
+    elseif (sp == "Aspire XC600") then chain()
     -- Acer Revo 70 (Desktop PC)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Acer" and sp == "TravelMate 5735Z") then
+    elseif (sp == "Revo 70") then chain()
     -- Acer TravelMate 5735Z (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Acer" and sp == "Calpella") then
+    elseif (sp == "TravelMate 5735Z") then chain()
     -- Acer TravelMate 5740-332G25Mn (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Acer            " and sp == "TravelMate 5740 ") then
-    -- Acer TravelMate 5740 (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Acer" and sp == "TravelMate 5742") then
+    elseif (sp == "Calpella") then chain()
     -- Acer TravelMate 5742 (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Acer" and sp == "TravelMate 5744") then
+    elseif (sp == "TravelMate 5742") then chain()
     -- Acer TravelMate 5744 (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Acer" and sp == "TravelMate 5760G") then
+    elseif (sp == "TravelMate 5744") then chain()
     -- Acer TravelMate 5760G (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Acer" and sp == "TravelMate 5760") then
+    elseif (sp == "TravelMate 5760G") then chain()
     -- Acer TravelMate 5760 (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Acer" and sp == "TravelMate 8571") then
+    elseif (sp == "TravelMate 5760") then chain()
     -- Acer TravelMate 8571 (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Acer" and sp == "TravelMate P653-M") then
+    elseif (sp == "TravelMate 8571") then chain()
     -- Acer TravelMate P653-M (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Acer" and sp == "AO531h") then
+    elseif (sp == "TravelMate P653-M") then chain()
     -- Acer TravelMate P653-M (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Acer" and sp == "Veriton E430G") then
+    elseif (sp == "AO531h") then chain()
     -- Acer Veriton E430G (Desktop-PC)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Acer                  " and sp == "Veriton L460") then
-    -- Acer Veriton L460 (Desktop PC)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Acer" and sp == "Veriton M2610G") then
+    elseif (sp == "Veriton E430G") then chain()
     -- Acer Veriton M2610G (Desktop PC)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Acer" and sp == "Veriton M290") then
+    elseif (sp == "Veriton M2610G") then chain()
     -- Acer Veriton M290 (Desktop PC)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Acer" and sp == "Veriton N4620G") then
+    elseif (sp == "Veriton M290") then chain()
     -- Acer Veriton N4620G (Desktop PC)
-    syslinux.run_command("chain.c32 hd0")
+    elseif (sp == "Veriton N4620G") then chain()
+    end
+  elseif (sm == "Acer            ") then
+    if (false) then
+    -- Acer Aspire One D255 (Notebook)
+    elseif (sp == "AOD255          ") then chain()
+    -- Acer TravelMate 5740 (Notebook)
+    elseif (sp == "TravelMate 5740 ") then chain()
+    end
+  elseif (sm == "Acer                  ") then
+    if (false) then
+    -- Acer Veriton L460 (Desktop PC)
+    elseif (sp == "Veriton L460") then chain()
+    end
 
   -- ASUS
-  elseif (bm == "ASUSTeK Computer INC." and bp == "A8N-VM T-System-CSM") then
+  elseif (bm == "ASUSTeK Computer INC.") then
+    if (false) then
     -- ASUS A8N-VM (Mainboard)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (bm == "ASUSTeK COMPUTER INC." and bp == "B85M-E") then
-    -- ASUS B85M-E (Mainboard)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (bm == "ASUSTeK COMPUTER INC." and bp == "B85M-G") then
-    -- ASUS B85M-G (Mainboard)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (bm == "ASUSTeK COMPUTER INC." and bp == "H81M2") then
-    -- ASUS H81M2 (Mainboard)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "ASUS" and bp == "H81M-PLUS") then
-    -- ASUS H81Mi+ (Mainboard)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (bm == "ASUSTeK COMPUTER INC." and bp == "H81M-K") then
-    -- ASUS H81M-K (Mainboard)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (bm == "ASUSTeK Computer INC." and bp == "M2N-VM DVI") then
+    elseif (bp == "A8N-VM T-System-CSM") then chain()
     -- ASUS M2N-VM DVI (Mainboard)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (bm == "ASUSTeK Computer INC." and bp == "M2N-VM SE") then
+    elseif (bp == "M2N-VM DVI") then chain()
     -- ASUS M2N-VM SE (Mainboard)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (bm == "ASUSTeK Computer INC." and bp == "M4N68T-M-LE-V2") then
+    elseif (bp == "M2N-VM SE") then chain()
     -- ASUS M4N68T-M-LE-V2 (Mainboard)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (bm == "ASUSTeK Computer INC." and bp == "M5A78L-M LX") then
+    elseif (bp == "M4N68T-M-LE-V2") then chain()
     -- ASUS M5A78L-M LX (Mainboard)
-    syslinux.run_command("chain.c32 hd0")
+    elseif (bp == "M5A78L-M LX") then chain()
+    end
+  elseif (bm == "ASUSTeK COMPUTER INC.") then
+    if (false) then
+    -- ASUS B85M-E (Mainboard)
+    elseif (bp == "B85M-E") then chain()
+    -- ASUS B85M-G (Mainboard)
+    elseif (bp == "B85M-G") then chain()
+    -- ASUS H81M2 (Mainboard)
+    elseif (bp == "H81M2") then chain()
+    -- ASUS H81M-K (Mainboard)
+    elseif (bp == "H81M-K") then chain()
+    end
+  elseif (sm == "ASUS") then
+    if (false) then
+    -- ASUS H81Mi+ (Mainboard)
+    elseif (bp == "H81M-PLUS") then chain()
+    end
 
   -- Bluechip
-  elseif (sm == "bluechip Computer AG" and bp == "B85M-E") then
+  elseif (sm == "bluechip Computer AG") then
+    if (false) then
     -- Bluechip BUSINESSline M ZT i3-4130 (Desktop PC)
-    syslinux.run_command("chain.c32 hd0")
+    elseif (bp == "B85M-E") then chain()
+    end
 
   -- Compaq
-  elseif (sm == "Compaq" and sp == "Evo D510 SFF") then
+  elseif (sm == "Compaq") then
+    if (false) then
     -- Compaq Evo d510 SFF (Notebook)
-    syslinux.run_command("chain.c32 hd0")
+    elseif (sp == "Evo D510 SFF") then chain()
+    end
 
   -- Dell
-  elseif (sm == "Dell Inc." and sp == "Latitude E5520") then
+  elseif (sm == "Dell Inc.") then
+    if (false) then
     -- Dell Latitude E5520 (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Dell Inc." and sp == "OptiPlex 3020") then
+    elseif (sp == "Latitude E5520") then chain()
     -- Dell OptiPlex 3020 (Desktop PC)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Dell Inc." and sp == "OptiPlex 390") then
+    elseif (sp == "OptiPlex 3020") then chain()
     -- Dell OptiPlex 390 (Desktop PC)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Dell Inc." and sp == "OptiPlex 790") then
+    elseif (sp == "OptiPlex 390") then chain()
     -- Dell OptiPlex 790 (Desktop PC)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Dell Inc." and sp == "OptiPlex 990") then
+    elseif (sp == "OptiPlex 790") then chain()
     -- Dell OptiPlex 990 (Desktop PC)
-    syslinux.run_command("chain.c32 hd0")
+    elseif (sp == "OptiPlex 990") then chain()
+    end
 
   -- eMachines
-  elseif (sm == "eMachines " and sp == "eMachines E725 ") then
+  elseif (sm == "eMachines ") then
+    if (false) then
     -- eMachines 725 (Notebook)
-    syslinux.run_command("chain.c32 hd0")
+    elseif (sp == "eMachines E725 ") then chain()
+    end
 
   -- Fujitsu
-  elseif (sm == "FUJITSU SIEMENS" and sp == "ESPRIMO E") then
+  elseif (sm == "FUJITSU SIEMENS") then
+    if (false) then
     -- Fujitsu ESPRIMO E5915 (Desktop PC)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "FUJITSU SIEMENS" and sp == "ESPRIMO Mobile D9510") then
+    elseif (sp == "ESPRIMO E") then chain()
     -- Fujitsu Esprimo Mobile D9510 (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "FUJITSU SIEMENS" and sp == "ESPRIMO Mobile V5535") then
+    elseif (sp == "ESPRIMO Mobile D9510") then chain()
     -- Fujitsu Esprimo Mobile V5535 (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "FUJITSU                         " and sp == "ESPRIMO P5731                 ") then
+    elseif (sp == "ESPRIMO Mobile V5535") then chain()
+    end
+  elseif (sm == "FUJITSU                         ") then
+    if (false) then
     -- Fujitsu Esprimo P5731 (Desktop PC)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "FUJITSU" and sp == "ESPRIMO P910") then
+    elseif (sp == "ESPRIMO P5731                 ") then chain()
+    end
+  elseif (sm == "FUJITSU") then
+    if (false) then
     -- Fujitsu Esprimo P910 (Desktop PC)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "FUJITSU" and sp == "ESPRIMO Q510") then
+    elseif (sp == "ESPRIMO P910") then chain()
     -- Fujitsu Esprimo Q510 (Desktop PC)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "FUJITSU" and sp == "LIFEBOOK A512") then
+    elseif (sp == "ESPRIMO Q510") then chain()
     -- Fujitsu LifeBook A512 (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "FUJITSU" and sp == "LIFEBOOK A530") then
+    elseif (sp == "LIFEBOOK A512") then chain()
     -- Fujitsu LifeBook A530 (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "FUJITSU" and sp == "LIFEBOOK A531") then
+    elseif (sp == "LIFEBOOK A530") then chain()
     -- Fujitsu LifeBook A531 (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "FUJITSU" and sp == "LIFEBOOK A532") then
+    elseif (sp == "LIFEBOOK A531") then chain()
     -- Fujitsu LifeBook A532 (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "FUJITSU" and sp == "LIFEBOOK P702") then
+    elseif (sp == "LIFEBOOK A532") then chain()
     -- Fujitsu LifeBook P702 (Notebook)
-    syslinux.run_command("chain.c32 hd0")
+    elseif (sp == "LIFEBOOK P702") then chain()
+    end
 
   -- Gigabyte Technology
-  elseif (bm == "Gigabyte Technology Co., Ltd." and bp == "B75M-D3H") then
+  elseif (bm == "Gigabyte Technology Co., Ltd.") then
+    if (false) then
     -- Gigabyte B75M-D3H (Mainboard)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (bm == "Gigabyte Technology Co., Ltd." and bp == "EP31-DS3L") then
+    elseif (bp == "B75M-D3H") then chain()
     -- Gigabyte EP31-DS3L (Mainboard)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (bm == "Gigabyte Technology Co., Ltd." and bp == "H81M-D2W") then
+    elseif (bp == "EP31-DS3L") then chain()
     -- Gigabyte Technology H81M-D2W (Mainboard)
-    syslinux.run_command("chain.c32 hd0")
+    elseif (bp == "H81M-D2W") then chain()
+    end
 
   -- HP
-  elseif (sm == "Hewlett-Packard" and sp == "HP 630 Notebook PC              ") then
+  elseif (sm == "Hewlett-Packard") then
+    if (false) then
     -- HP 630 (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Hewlett-Packard" and sp == "HP 635 Notebook PC              ") then
+    elseif (sp == "HP 630 Notebook PC              ") then chain()
     -- HP 635 (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Hewlett-Packard" and sp == "HP 650 Notebook PC") then
+    elseif (sp == "HP 635 Notebook PC              ") then chain()
     -- HP 650 (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Hewlett-Packard" and sp == "HP 655 Notebook PC") then
+    elseif (sp == "HP 650 Notebook PC") then chain()
     -- HP 655 (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Hewlett-Packard" and sp == "Compaq 610") then
+    elseif (sp == "HP 655 Notebook PC") then chain()
     -- HP Compaq 610 (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Hewlett-Packard" and sp == "HP d530 SFF(DC578AV)") then
+    elseif (sp == "Compaq 610") then chain()
     -- HP d530 (Desktop PC)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Hewlett-Packard" and sp == "HP d530 SFF(DG781A)") then
+    elseif (sp == "HP d530 SFF(DC578AV)") then chain()
     -- HP d530 (Desktop PC)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Hewlett-Packard" and sp == "HP EliteBook 6930p") then
+    elseif (sp == "HP d530 SFF(DG781A)") then chain()
     -- HP EliteBook 6930p (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "Hewlett-Packard" and sp == "HP Pavilion g6 Notebook PC      ") then
+    elseif (sp == "HP EliteBook 6930p") then chain()
     -- HP Pavilion g6 (Notebook)
-    syslinux.run_command("chain.c32 hd0")
+    elseif (sp == "HP Pavilion g6 Notebook PC      ") then chain()
+    end
 
   -- Lenovo
-  elseif (sm == "LENOVO" and sv == "Lenovo B580") then
+  elseif (sm == "LENOVO") then
+    if (false) then
     -- Lenovo B580 (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "LENOVO" and sv == "Lenovo IdeaPad S10-2            ") then
+    elseif (sv == "Lenovo B580") then chain()
     -- Lenovo Ideapad S10-2 (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "LENOVO" and sv == "ThinkCentre E73") then
+    elseif (sv == "Lenovo IdeaPad S10-2            ") then chain()
     -- Lenovo ThinkCentre E73 (Desktop PC)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "LENOVO" and sv == "ThinkCentre Edge72") then
+    elseif (sv == "ThinkCentre E73") then chain()
     -- Lenovo ThinkCentre Edge72 (Desktop PC)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "LENOVO" and sv == "ThinkCentre M57") then
+    elseif (sv == "ThinkCentre Edge72") then chain()
     -- Lenovo ThinkCentre M57 (Desktop PC)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "LENOVO" and sv == "ThinkCentre M72e") then
+    elseif (sv == "ThinkCentre M57") then chain()
     -- Lenovo ThinkCentre M72e (Desktop PC)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "LENOVO" and sv == "ThinkCentre M73") then
+    elseif (sv == "ThinkCentre M72e") then chain()
     -- Lenovo ThinkCentre M73 (Desktop PC)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "LENOVO" and sv == "ThinkCentre M82") then
+    elseif (sv == "ThinkCentre M73") then chain()
     -- Lenovo ThinkCentre M82 (Desktop PC)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "LENOVO" and sp == "2697") then
+    elseif (sv == "ThinkCentre M82") then chain()
     -- Lenovo ThinkCentre M82 (Desktop PC)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "LENOVO" and sp == "2697B63") then
+    elseif (sp == "2697") then chain()
     -- Lenovo ThinkCentre M82 (Desktop PC)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "LENOVO" and sv == "ThinkCentre M92") then
+    elseif (sp == "2697B63") then chain()
     -- Lenovo ThinkCentre M92 (Desktop PC)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "LENOVO" and sv == "ThinkCentre M93") then
+    elseif (sv == "ThinkCentre M92") then chain()
     -- Lenovo ThinkCentre M93 (Desktop PC)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "LENOVO" and sv == "ThinkPad E520") then
+    elseif (sv == "ThinkCentre M93") then chain()
     -- Lenovo ThinkPad Edge E520 (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "LENOVO" and sv == "ThinkPad T520") then
+    elseif (sv == "ThinkPad E520") then chain()
     -- Lenovo ThinkPad T520 (Notebook)
-    syslinux.run_command("chain.c32 hd0")
+    elseif (sv == "ThinkPad T520") then chain()
+    end
 
   -- Oracle
-  elseif (sm == "innotek GmbH" and sp == "VirtualBox" and
-      string.find(syslinux.version(), "ISOLINUX")) then
+  elseif (sm == "innotek GmbH") then
+    if (false) then
     -- Oracle VirtualBox
     --[[
        This is a special case - VirtualBox usually works fine with LOCALBOOT,
@@ -319,30 +306,32 @@ else
        that we're running from ISOLINUX installed on a CD, so this exception
        only occurs on ISOLINUX and not on PXELINUX.
     ]]--
-    syslinux.run_command("chain.c32 hd0")
+    elseif (sp == "VirtualBox" and
+      string.find(syslinux.version(), "ISOLINUX")) then chain()
+    end
 
   -- Samsung
-  elseif (sm == "SAMSUNG ELECTRONICS CO., LTD." and
-      sp == "300E4A/300E5A/300E7A/3430EA/3530EA") then
+  elseif (sm == "SAMSUNG ELECTRONICS CO., LTD.") then
     -- Samsung 300E7A-S08 (Notebook)
-    syslinux.run_command("chain.c32 hd0")
+    if (sp == "300E4A/300E5A/300E7A/3430EA/3530EA") then chain()
+    end
 
   -- Toshiba
-  elseif (sm == "TOSHIBA" and sp == "Satellite L300D") then
-    -- Toshiba Satellite L300D (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "TOSHIBA" and sp == "Satellite Pro C660") then
-    -- Toshiba Satellite Pro C660 (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "TOSHIBA" and sp == "SATELLITE PRO C850-1HL") then
-    -- Toshiba Satellite Pro C850-1HL (Notebook)
-    syslinux.run_command("chain.c32 hd0")
-  elseif (sm == "TOSHIBA" and sp == "Satellite Pro C850-1K0") then
-    -- Toshiba Satellite Pro C850-1K0 (Notebook)
-    syslinux.run_command("chain.c32 hd0")
+  elseif (sm == "TOSHIBA") then
+    if (false) then
+      -- Toshiba Satellite L300D (Notebook)
+    elseif (sp == "Satellite L300D") then chain()
+      -- Toshiba Satellite Pro C660 (Notebook)
+    elseif (sp == "Satellite Pro C660") then chain()
+      -- Toshiba Satellite Pro C850-1HL (Notebook)
+    elseif (sp == "SATELLITE PRO C850-1HL") then chain()
+      -- Toshiba Satellite Pro C850-1K0 (Notebook)
+    elseif (sp == "Satellite Pro C850-1K0") then chain()
+    end
 
   end
-  syslinux.local_boot(0)
 end
+
+localboot()
 
 -- vim: ft=lua
