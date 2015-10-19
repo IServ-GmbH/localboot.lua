@@ -17,7 +17,11 @@ function printdmi(cat, var)
     -- PXELINUX 4
     val = dmitable[cat .. "." .. var]
   end
-  print(string.format('(%2d)"%s"', #val, val))
+  if (val) then
+    print(string.format('(%2d)"%s"', #val, val))
+  else
+    print('<undefined>')
+  end
 end
 
 print("===============================================================================")
