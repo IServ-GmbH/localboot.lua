@@ -298,6 +298,9 @@ else
   elseif (sm == "LENOVO" and sv == "ThinkCentre M93") then
     -- Lenovo ThinkCentre M93 (Desktop PC)
     syslinux.run_command("chain.c32 hd0")
+  elseif (sm == "LENOVO" and sv == "ThinkCentre M93p") then
+    -- Lenovo ThinkCentre M93p (Desktop PC)
+    syslinux.run_command("chain.c32 hd0")
   elseif (sm == "LENOVO" and sv == "ThinkPad E520") then
     -- Lenovo ThinkPad Edge E520 (Notebook)
     syslinux.run_command("chain.c32 hd0")
